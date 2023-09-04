@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vet-clinic-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: DearingClinic
+  template:
+    metadata:
+      labels:
+        app: DearingClinic
+    spec:
+      containers:
+        - name: dearingvetclinic-container
+          image: cmakkaya/veterinary-clinic:DearingVetClinic 
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MYSQL_URL
+              value: "jdbc:mysql://mysql-service.default.svc.cluster.local/petclinic"
+            - name : MYSQL_USER
+              value: petclinic
+            - name : MYSQL_PASSWORD
+              value: petclinic
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: vet-clinic-service
+spec:
+  selector:
+    app: DearingClinic
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
